@@ -1,14 +1,13 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
 
-public class FIFOpage{
+public class Optimalpage {
     public HashSet<String> pageSet;
-    public final Queue<String> index;
+    public final ArrayList<String> index;
 
-    FIFOpage(){
+    Optimalpage(){
         pageSet = new HashSet<>();
-        index = new LinkedList<>();
+        index = new ArrayList<String>() ;
     }
 }

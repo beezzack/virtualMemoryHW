@@ -10,28 +10,27 @@ public class Main {
 
         for (String s:memReference.allRandom
                 ) {
-            if(thePage.pageSet.size()>=pageTableSize){//if page table is full && element 不在page table 刪除最先放進去的
-                pagefault++;
+            if(thePage.pageSet.size()>=pageTableSize){//if page table is full
                 String tmp = thePage.index.peek();
-                if(!thePage.pageSet.contains(s)){
-                    thePage.pageSet.remove(tmp);
+                if(!thePage.pageSet.contains(s)){//element 不在page table i.e. Trap
+                    pagefault++;
+                    thePage.pageSet.remove(tmp);//刪除最先放進去的
                     thePage.index.remove();
 
-                    //get element in hardDrive;
-                    String tmpReference = thereference.reference[Integer.valueOf(s)-1];
+                    //get element in hardDrive; bring in the missing page, write++
+                    String tmpReference = thereference.reference[Integer.parseInt(s)-1];
                     harddriveW++;
                     thePage.pageSet.add(tmpReference);
                     thePage.index.add(tmpReference);
                 }
-                else{
+                else {
                     //make tmp become first input,
                     thePage.index.remove();
                     thePage.index.add(tmp);
                 }
-                //System.out.println("pagefault occur, remove "+tmp+" add "+s);
             }
-            else{
-                String tmpReference = thereference.reference[Integer.valueOf(s)-1];
+            else{//still have space put in a free frame refresh page table
+                String tmpReference = thereference.reference[Integer.parseInt(s)-1];
                 thePage.pageSet.add(tmpReference);
                 thePage.index.add(tmpReference);
             }
@@ -39,7 +38,15 @@ public class Main {
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
     }
     static private void OptimalAlgo(int pageTableSize){
-        
+        Optimalpage thePage = new Optimalpage();
+        HardDrive thereference = new HardDrive();
+        RandomReference memReference = new RandomReference(20);
+        int pagefault = 0;
+        int harddriveW = 0;
+
+        for (String s : memReference.allRandom
+             ) {
+        }
     }
     public static void main(String[] args) {
         int pageTableSize = 10;
