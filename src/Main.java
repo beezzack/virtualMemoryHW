@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
 public class Main {
 
     static private void FIFOAlgo(int pageTableSize){
@@ -44,9 +48,37 @@ public class Main {
         int pagefault = 0;
         int harddriveW = 0;
 
-        for (String s : memReference.allRandom
+        for (int i = 0; i<=memReference.allRandom.length; i++
              ) {
+            if(thePage.pageSet.size()>=pagefault){// page table full
+                if(!thePage.pageSet.contains(memReference.allRandom[i])){ //page fault
+                    int predictResult = predict(memReference,thePage.index,i);
+                    if(predictResult != 0){
+                        String victim = thePage.index.get(predictResult);
+                        thePage.pageSet.remove(victim);
+                    }
+                    else{
+                        String victim = thePage.index.get(0);
+                    }
+
+
+                }
+            }
+
         }
+    }
+    static private int predict(RandomReference memReference, ArrayList index,int startPoint){
+        int victim = 0;
+        String[] arr = new String[10];
+        //store 10 data which will use in the future
+        for(int i = 0; i < 10; i++ ){
+            arr[i] = (String) index.get(startPoint+i);
+        }
+
+
+
+
+        return victim;
     }
     public static void main(String[] args) {
         int pageTableSize = 10;
