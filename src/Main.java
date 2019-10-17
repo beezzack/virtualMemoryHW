@@ -53,7 +53,7 @@ public class Main {
             if(thePage.pageSet.size() >= pageTableSize){// page table full
                 if(!thePage.pageSet.contains(thisreference)){ //page fault
                     pagefault++;
-                    int predictResult = Integer.parseInt(predict(memReference,thePage.index,i));
+                    int predictResult = predict(memReference,thePage.index,i);
                     int victim = thePage.index.get(predictResult);
                     //TO DO Disk write
                     thePage.index.remove(predictResult);
@@ -77,27 +77,27 @@ public class Main {
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
     }
-    static private String predict(RandomReference memReference, ArrayList index,int startPoint){
+    static private int predict(RandomReference memReference, ArrayList index,int startPoint){
         //回傳最久才用到的memmory reference
         int victimIndex = 0;
         //找最遠才用到的element當victim.
-        String tmpString,victimString;
-        victimString = Integer.toString((int)(Math.random()*(index.size())));
+        int tmp,victim;
+        victim = (int)(Math.random()*(index.size()));
         int farestIndex;
         for (int i = 0; i < index.size(); i++) {
-            tmpString = (String) index.get(i);
+            tmp = (Integer) index.get(i);
             farestIndex = 0;
             for(int j = startPoint; j< memReference.allRandom.length; j++){
-                if(tmpString.equals(memReference.allRandom[j])){
+                if(tmp == memReference.allRandom[j]){
                     farestIndex = j;
                 }
             }
             if(farestIndex >= victimIndex){
                 victimIndex = farestIndex;
-                victimString = tmpString;
+                victim = tmp;
             }
         }
-        return victimString;
+        return victim;
     }
     public static void main(String[] args) {
         int pageTableSize = 10;
