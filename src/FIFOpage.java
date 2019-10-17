@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class FIFOpage{
-    public HashSet<String> pageSet;
-    public final Queue<String> index;
+    public HashSet<Integer> pageSet;
+    public final Queue<Integer> index;
 
     FIFOpage(){
         pageSet = new HashSet<>();

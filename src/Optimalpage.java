@@ -3,11 +3,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 public class Optimalpage {
-    public HashSet<String> pageSet;
-    public final ArrayList<String> index;
+    public HashSet<Integer> pageSet;
+    public final ArrayList<Integer> index;
 
     Optimalpage(){
         pageSet = new HashSet<>();
-        index = new ArrayList<String>() ;
+        index = new ArrayList<>() ;
     }
 }

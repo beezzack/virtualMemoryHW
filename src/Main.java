@@ -12,17 +12,17 @@ public class Main {
         int pagefault = 0;
         int harddriveW = 0;
 
-        for (String s:memReference.allRandom
+        for (int s:memReference.allRandom
                 ) {
             if(thePage.pageSet.size()>=pageTableSize){//if page table is full
-                String tmp = thePage.index.peek();
+                int tmp = thePage.index.peek();
                 if(!thePage.pageSet.contains(s)){//element 不在page table i.e. Trap
                     pagefault++;
                     thePage.pageSet.remove(tmp);//刪除最先放進去的
                     thePage.index.remove();
 
                     //get element in hardDrive; bring in the missing page
-                    String tmpReference = thereference.reference[Integer.parseInt(s)-1];
+                    int tmpReference = thereference.reference[s-1];
                     thePage.pageSet.add(tmpReference);
                     thePage.index.add(tmpReference);
                 }
@@ -33,7 +33,7 @@ public class Main {
                 }
             }
             else{//still have space put in a free frame refresh page table
-                String diskReference = thereference.reference[Integer.parseInt(s)-1];
+                int diskReference = thereference.reference[s-1];
                 thePage.pageSet.add(diskReference);
                 thePage.index.add(diskReference);
             }
@@ -49,18 +49,18 @@ public class Main {
 
         for (int i = 0; i<=memReference.allRandom.length; i++
              ) {
-            String thisreference = memReference.allRandom[i];
+            int thisreference = memReference.allRandom[i];
             if(thePage.pageSet.size() >= pageTableSize){// page table full
                 if(!thePage.pageSet.contains(thisreference)){ //page fault
                     pagefault++;
                     int predictResult = Integer.parseInt(predict(memReference,thePage.index,i));
-                    String victim = thePage.index.get(predictResult);
+                    int victim = thePage.index.get(predictResult);
                     //TO DO Disk write
                     thePage.index.remove(predictResult);
                     thePage.pageSet.remove(victim);
 
                     //get element in hardDrive; bring in the missing page
-                    String diskReference = thereference.reference[Integer.parseInt(thisreference)-1];
+                    int diskReference = thereference.reference[thisreference-1];
                     thePage.index.add(diskReference);
                     thePage.pageSet.add(diskReference);
                 }
@@ -69,7 +69,7 @@ public class Main {
                 if(!thePage.pageSet.contains(thisreference)){ //page fault
                     pagefault++;
                     //get element in hardDrive; bring in the missing page
-                    String diskReference = thereference.reference[Integer.parseInt(thisreference)-1];
+                    int diskReference = thereference.reference[thisreference-1];
                     thePage.index.add(diskReference);
                     thePage.pageSet.add(diskReference);
                 }
