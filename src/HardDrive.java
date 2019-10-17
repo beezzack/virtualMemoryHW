@@ -4,7 +4,7 @@ public class HardDrive {
 
     HardDrive(){
         for (int i = 0; i < 500; i++){
-            reference[i] = Integer.toString(i);
+            reference[i] = Integer.toString(i+1);
         }
     }
 }

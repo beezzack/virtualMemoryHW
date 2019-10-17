@@ -21,9 +21,8 @@ public class Main {
                     thePage.pageSet.remove(tmp);//刪除最先放進去的
                     thePage.index.remove();
 
-                    //get element in hardDrive; bring in the missing page, write++
+                    //get element in hardDrive; bring in the missing page
                     String tmpReference = thereference.reference[Integer.parseInt(s)-1];
-                    harddriveW++;
                     thePage.pageSet.add(tmpReference);
                     thePage.index.add(tmpReference);
                 }
@@ -34,9 +33,9 @@ public class Main {
                 }
             }
             else{//still have space put in a free frame refresh page table
-                String tmpReference = thereference.reference[Integer.parseInt(s)-1];
-                thePage.pageSet.add(tmpReference);
-                thePage.index.add(tmpReference);
+                String diskReference = thereference.reference[Integer.parseInt(s)-1];
+                thePage.pageSet.add(diskReference);
+                thePage.index.add(diskReference);
             }
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
@@ -50,39 +49,60 @@ public class Main {
 
         for (int i = 0; i<=memReference.allRandom.length; i++
              ) {
-            if(thePage.pageSet.size()>=pagefault){// page table full
-                if(!thePage.pageSet.contains(memReference.allRandom[i])){ //page fault
-                    int predictResult = predict(memReference,thePage.index,i);
-                    if(predictResult != 0){
-                        String victim = thePage.index.get(predictResult);
-                        thePage.pageSet.remove(victim);
-                    }
-                    else{
-                        String victim = thePage.index.get(0);
-                    }
+            String thisreference = memReference.allRandom[i];
+            if(thePage.pageSet.size() >= pageTableSize){// page table full
+                if(!thePage.pageSet.contains(thisreference)){ //page fault
+                    pagefault++;
+                    int predictResult = Integer.parseInt(predict(memReference,thePage.index,i));
+                    String victim = thePage.index.get(predictResult);
+                    //TO DO Disk write
+                    thePage.index.remove(predictResult);
+                    thePage.pageSet.remove(victim);
 
-
+                    //get element in hardDrive; bring in the missing page
+                    String diskReference = thereference.reference[Integer.parseInt(thisreference)-1];
+                    thePage.index.add(diskReference);
+                    thePage.pageSet.add(diskReference);
                 }
             }
-
+            else{
+                if(!thePage.pageSet.contains(thisreference)){ //page fault
+                    pagefault++;
+                    //get element in hardDrive; bring in the missing page
+                    String diskReference = thereference.reference[Integer.parseInt(thisreference)-1];
+                    thePage.index.add(diskReference);
+                    thePage.pageSet.add(diskReference);
+                }
+            }
         }
+        System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
     }
-    static private int predict(RandomReference memReference, ArrayList index,int startPoint){
-        int victim = 0;
-        String[] arr = new String[10];
-        //store 10 data which will use in the future
-        for(int i = 0; i < 10; i++ ){
-            arr[i] = (String) index.get(startPoint+i);
+    static private String predict(RandomReference memReference, ArrayList index,int startPoint){
+        //回傳最久才用到的memmory reference
+        int victimIndex = 0;
+        //找最遠才用到的element當victim.
+        String tmpString,victimString;
+        victimString = Integer.toString((int)(Math.random()*(index.size())));
+        int farestIndex;
+        for (int i = 0; i < index.size(); i++) {
+            tmpString = (String) index.get(i);
+            farestIndex = 0;
+            for(int j = startPoint; j< memReference.allRandom.length; j++){
+                if(tmpString.equals(memReference.allRandom[j])){
+                    farestIndex = j;
+                }
+            }
+            if(farestIndex >= victimIndex){
+                victimIndex = farestIndex;
+                victimString = tmpString;
+            }
         }
-
-
-
-
-        return victim;
+        return victimString;
     }
     public static void main(String[] args) {
         int pageTableSize = 10;
         FIFOAlgo(pageTableSize);
+        OptimalAlgo(pageTableSize);
 
 
 
