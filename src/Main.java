@@ -47,17 +47,16 @@ public class Main {
         int pagefault = 0;
         int harddriveW = 0;
 
-        for (int i = 0; i<=memReference.allRandom.length; i++
+        for (int i = 0; i<memReference.allRandom.length; i++
              ) {
             int thisreference = memReference.allRandom[i];
             if(thePage.pageSet.size() >= pageTableSize){// page table full
                 if(!thePage.pageSet.contains(thisreference)){ //page fault
                     pagefault++;
                     int predictResult = predict(memReference,thePage.index,i);
-                    int victim = thePage.index.get(predictResult);
                     //TO DO Disk write
                     thePage.index.remove(predictResult);
-                    thePage.pageSet.remove(victim);
+                    thePage.pageSet.remove(predictResult);
 
                     //get element in hardDrive; bring in the missing page
                     int diskReference = thereference.reference[thisreference-1];
@@ -82,8 +81,8 @@ public class Main {
         int victimIndex = 0;
         //找最遠才用到的element當victim.
         int tmp,victim;
-        victim = (int)(Math.random()*(index.size()));
-        int farestIndex;
+        victim = (int)(Math.random()*20+1);
+        int farestIndex = 0;
         for (int i = 0; i < index.size(); i++) {
             tmp = (Integer) index.get(i);
             farestIndex = 0;
@@ -97,7 +96,7 @@ public class Main {
                 victim = tmp;
             }
         }
-        return victim;
+        return index.indexOf(victim);
     }
     public static void main(String[] args) {
         int pageTableSize = 10;
