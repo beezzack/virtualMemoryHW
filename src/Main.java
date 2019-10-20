@@ -28,14 +28,22 @@ public class Main {
                 }
                 else {
                     //make tmp become first input,
-                    thePage.index.remove();
-                    thePage.index.add(tmp);
+                    thePage.index.remove(s);
+                    thePage.index.add(s);
                 }
             }
             else{//still have space put in a free frame refresh page table
-                int diskReference = thereference.reference[s-1];
-                thePage.pageSet.add(diskReference);
-                thePage.index.add(diskReference);
+                if(!thePage.pageSet.contains(s)){//element 不在page table i.e. Trap
+                    pagefault++;
+                    int diskReference = thereference.reference[s-1];
+                    thePage.pageSet.add(diskReference);
+                    thePage.index.add(diskReference);
+                }
+                else{
+                    //make tmp become first input,
+                    thePage.index.remove(s);
+                    thePage.index.add(s);
+                }
             }
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
@@ -50,13 +58,21 @@ public class Main {
         for (int i = 0; i<memReference.allRandom.length; i++
              ) {
             int thisreference = memReference.allRandom[i];
+/*            for (int a :thePage.pageSet
+                 ) {
+                System.out.print(a+" ");
+            }
+            System.out.println(": "  + thisreference);*/
             if(thePage.pageSet.size() >= pageTableSize){// page table full
                 if(!thePage.pageSet.contains(thisreference)){ //page fault
                     pagefault++;
-                    int predictResult = predict(memReference,thePage.index,i);
+                    int predictResult = predict(pageTableSize,memReference,thePage.index,i);
                     //TO DO Disk write
+
+                    //
+                    thePage.pageSet.remove(thePage.index.get(predictResult));
                     thePage.index.remove(predictResult);
-                    thePage.pageSet.remove(predictResult);
+
 
                     //get element in hardDrive; bring in the missing page
                     int diskReference = thereference.reference[thisreference-1];
@@ -76,23 +92,24 @@ public class Main {
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
     }
-    static private int predict(RandomReference memReference, ArrayList index,int startPoint){
+    static private int predict(int pagetablesize, RandomReference memReference, ArrayList index,int startPoint){
         //回傳最久才用到的memmory reference
         int victimIndex = 0;
         //找最遠才用到的element當victim.
         int tmp,victim;
-        victim = (int)(Math.random()*20+1);
+        victim = (int)(Math.random()*pagetablesize);
         int farestIndex = 0;
         for (int i = 0; i < index.size(); i++) {
             tmp = (Integer) index.get(i);
-            farestIndex = 0;
+            victimIndex = 0;
             for(int j = startPoint; j< memReference.allRandom.length; j++){
                 if(tmp == memReference.allRandom[j]){
-                    farestIndex = j;
+                    victimIndex = j;
+                    break; //stop, find first element
                 }
             }
-            if(farestIndex >= victimIndex){
-                victimIndex = farestIndex;
+            if(victimIndex >= farestIndex){
+                farestIndex = victimIndex ;
                 victim = tmp;
             }
         }
