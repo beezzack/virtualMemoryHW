@@ -21,6 +21,9 @@ public class Main {
                     thePage.pageSet.remove(tmp);//刪除最先放進去的
                     thePage.index.remove();
 
+                    //maybe the disk need to write first because the value in physical memory.
+                    int randomNum = (int)(Math.random()*10+1);
+                    if(randomNum<=3)harddriveW++;
                     //get element in hardDrive; bring in the missing page
                     int tmpReference = thereference.reference[s-1];
                     thePage.pageSet.add(tmpReference);
@@ -67,9 +70,11 @@ public class Main {
                 if(!thePage.pageSet.contains(thisreference)){ //page fault
                     pagefault++;
                     int predictResult = predict(pageTableSize,memReference,thePage.index,i);
-                    //TO DO Disk write
 
-                    //
+                    //maybe the disk need to write first because the value in physical memory.
+                    int randomNum = (int)(Math.random()*10+1);
+                    if(randomNum<=3)harddriveW++;
+
                     thePage.pageSet.remove(thePage.index.get(predictResult));
                     thePage.index.remove(predictResult);
 
