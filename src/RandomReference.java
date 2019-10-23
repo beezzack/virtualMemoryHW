@@ -11,6 +11,15 @@ public class RandomReference {
         for(int i = 0; i<100000; i++){
             allRandom[i] = (int)(Math.random()*500+1);
         }
-
+        int count =0 ;
+        while (count<Locality.length){
+            int range = (int)(Math.random()*25+25);
+            int index = (int)(Math.random()*(500-range)+1);
+            for(int i = 0; i<range; i++){
+                if(count+i>=100000)break;
+                Locality[count+i] = index+i;
+            }
+            count+=range;
+        }
     }
 }
