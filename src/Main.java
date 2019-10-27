@@ -125,6 +125,10 @@ public class Main {
                     else thePage.index.get(pickResult).modifyBit = 0;
                     thePage.index.get(pickResult).referenceBit = 1;
                     thePage.pageSet.add(diskReference);
+                    pickResult = ++pickResult%pageTableSize;
+                }
+                else {
+                    modify(thePage,thisreference);
                 }
             }
             else{
@@ -136,9 +140,82 @@ public class Main {
                     thePage.index.add(tmpESC);
                     thePage.pageSet.add(diskReference);
                 }
+                else {
+                    modify(thePage,thisreference);
+                }
             }
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
+    }
+    static private void CRSCAlgo(int pageTableSize,int[]testcase){
+        CRSCpage thePage = new CRSCpage();
+        HardDrive thereference = new HardDrive();
+        int pagefault = 0;
+        int harddriveW = 0;
+        int pickResult = 0;
+        int buffer = 0;
+        int thePTSize = pageTableSize-3;
+        for(int i = 0; i<testcase.length; i++){
+            if(thePage.pageSet.size()>=thePTSize){
+                if(!thePage.pageSet.contains(testcase[i])){
+                    pagefault++;
+                    pickResult = CRSCpick(thePage, pickResult,testcase[i],thePTSize);
+                    thePage.pageSet.remove(thePage.index.get(pickResult).pages);
+
+                    int randomNum = (int)(Math.random()*10+1);
+                    if(randomNum<=3)buffer++;
+                    if(buffer>=3){
+                        harddriveW++;
+                        buffer = 0;
+                    }
+
+                    //get element in hardDrive; bring in the missing page
+                    int diskReference = thereference.reference[testcase[i]-1];
+                    thePage.index.get(pickResult).pages = diskReference;
+                    thePage.index.get(pickResult).referenceBit = 1;
+                    thePage.pageSet.add(diskReference);
+                    pickResult = ++pickResult%thePTSize;
+                }
+                else {
+                    CRSCmodify(thePage,testcase[i]);
+                }
+            }
+            else {
+                if(!thePage.pageSet.contains(testcase[i])){ //page fault
+                    pagefault++;
+                    //get element in hardDrive; bring in the missing page
+                    int diskReference = thereference.reference[testcase[i]-1];
+                    CSRCDataStructure tmpESC = new CSRCDataStructure(diskReference);
+                    thePage.index.add(tmpESC);
+                    thePage.pageSet.add(diskReference);
+                }
+                else {
+                    CRSCmodify(thePage,testcase[i]);
+                }
+            }
+        }
+        System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
+    }
+    static private void modify(ESCpage thePage,int thisreference){
+        for (ESCDataStructure E:thePage.index
+             ) {
+            if(E.pages == thisreference){
+                E.referenceBit = 1;
+                int p = (int)(Math.random()*10+1);
+                if(p<=3)E.modifyBit = 1;
+                else E.modifyBit = 0;
+                break;
+            }
+        }
+    }
+    static private void CRSCmodify(CRSCpage thePage,int thisreference){
+        for (CSRCDataStructure E:thePage.index
+                ) {
+            if(E.pages == thisreference){
+                E.referenceBit = 1;
+                break;
+            }
+        }
     }
     static private int pick(int pagetablesize, ESCpage thePage,int startPoint){
         int j = startPoint;
@@ -161,8 +238,33 @@ public class Main {
             }
             count++;j = (++j)%pagetablesize;
         }
-        j = (int)(Math.random()*pagetablesize);
-        return j;
+        return startPoint;
+    }
+    static private int CRSCpick(CRSCpage thePage, int startpoint,int thisreference,int tableSize){
+        int pickResult = startpoint;
+        for (int i = 0; i < tableSize; i++){
+            boolean tmp1 = (thePage.index.get(pickResult).referenceBit == 0)&&(thePage.index.get(pickResult).SCBit == 0);
+            if(tmp1){
+                return pickResult;
+            }
+            pickResult = (++pickResult)%tableSize;
+        }
+        pickResult = startpoint;
+        for(int count = 0;count < tableSize*4; count++){
+            boolean tmp1 = (thePage.index.get(pickResult).referenceBit == 0)&&(thePage.index.get(pickResult).SCBit == 0);//1 0比1 1先被挑中
+            boolean tmp2 = (thePage.index.get(pickResult).referenceBit == 0)&&(thePage.index.get(pickResult).SCBit == 1);//0 1比另外兩情況先被挑中
+            if(tmp1)return pickResult;
+            else if(tmp2)return pickResult;
+            else{
+                if(Math.abs(thisreference-thePage.index.get(pickResult).pages)>=25){
+                    thePage.index.get(pickResult).referenceBit = 0;
+                }
+                thePage.index.get(pickResult).SCBit = 0;
+                pickResult = ++pickResult%tableSize;
+            }
+        }
+
+        return pickResult;
     }
     static private int predict(int pagetablesize, int[] testcase, ArrayList index,int startPoint){
         //回傳最久才用到的memmory reference
@@ -198,7 +300,7 @@ public class Main {
         switch (option){
             case 1: testcase = memReference.allRandom; break;
             case 2: testcase = memReference.Locality; break;
-            case 3: testcase = memReference.testcase; break;
+            case 3: testcase = memReference.mycase; break;
         }
         for (int pageTableSize = 10; pageTableSize <= 100; pageTableSize+=10){
             System.out.println("pageTableSize: "+ pageTableSize);
@@ -208,6 +310,8 @@ public class Main {
             OptimalAlgo(pageTableSize,testcase);
             System.out.print("  ESC :   ");
             ESCAlgo(pageTableSize,testcase);
+            System.out.print(" CRSC :   ");
+            CRSCAlgo(pageTableSize,testcase);
         }
 
 

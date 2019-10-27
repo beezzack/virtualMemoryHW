@@ -6,6 +6,7 @@ public class RandomReference {
     int allRandom[] = new int[100000];
     int testcase[] = {90, 85, 55, 94, 77, 90 ,85 ,85, 48, 77, 94, 77, 90 ,85};
     int Locality[] = new int[100000];
+    int mycase[] = new int[100000];
 
     RandomReference(int n){
         for(int i = 0; i<100000; i++){
@@ -20,6 +21,25 @@ public class RandomReference {
                 Locality[count+i] = index+i;
             }
             count+=range;
+        }
+        count =0 ;
+        int checkpoint = 0;
+        int indexcount = 0;
+
+
+        //window-slide data
+        while (count<mycase.length){
+            int index = (int)(Math.random()*50+1)+indexcount;
+            if(index>500){
+                index = 500;
+            }
+            mycase[count] = index;
+
+            count++;indexcount++;
+            if(indexcount>=200){
+                checkpoint++;
+                indexcount = 0;
+            }
         }
     }
 }
