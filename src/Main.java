@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5,7 +8,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    static private void FIFOAlgo(int pageTableSize,int[] testcase){
+    static private void FIFOAlgo(int pageTableSize,int[] testcase,ArrayList arr){
         /*
         FIFO 演算法:
         1. page fault++ 條件: 當table中沒有要求的reference
@@ -58,8 +61,9 @@ public class Main {
             }
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
+        arr.add( pagefault);
     }
-    static private void OptimalAlgo(int pageTableSize,int[] testcase){
+    static private void OptimalAlgo(int pageTableSize,int[] testcase,ArrayList arr){
         /*
         Optimal 演算法:
         1. page fault++ 條件: 當table中沒有要求的reference
@@ -111,8 +115,9 @@ public class Main {
             }
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
+        arr.add( pagefault);
     }
-    static private void ESCAlgo(int pageTableSize,int[]testcase){
+    static private void ESCAlgo(int pageTableSize,int[]testcase,ArrayList arr){
         /*
         ESC 演算法:
         1. page fault++ 條件: 當table中沒有要求的reference
@@ -169,8 +174,9 @@ public class Main {
             }
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
+        arr.add( pagefault);
     }
-    static private void CRSCAlgo(int pageTableSize,int[]testcase){
+    static private void CRSCAlgo(int pageTableSize,int[]testcase,ArrayList arr){
         /*
         CRSC 演算法:
         1. page fault++ 條件: 當table中沒有要求的reference
@@ -227,6 +233,7 @@ public class Main {
             }
         }
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
+        arr.add( pagefault);
     }
     static private void modify(ESCpage thePage,int thisreference){
         for (ESCDataStructure E:thePage.index
@@ -326,27 +333,68 @@ public class Main {
     public static void main(String[] args) {
         RandomReference memReference = new RandomReference(20);
         int[] testcase = memReference.allRandom;
+        String choice = new String();
         Scanner key = new Scanner(System.in);
         System.out.println("1.All random");
         System.out.println("2.Locality");
         System.out.println("3.Mytestcase");
-        int option = key.nextInt();
-        switch (option){
-            case 1: testcase = memReference.allRandom; break;
-            case 2: testcase = memReference.Locality; break;
-            case 3: testcase = memReference.mycase; break;
+        while (key.hasNextInt()){
+            int option = key.nextInt();
+            switch (option){
+                case 1: testcase = memReference.allRandom; choice = "allrandom.csv"; break;
+                case 2: testcase = memReference.Locality; choice = "Locality.csv"; break;
+                case 3: testcase = memReference.mycase; choice = "mycase.csv"; break;
+            }
+            ArrayList<Integer> FIFOarr = new ArrayList<Integer>();
+            ArrayList<Integer> OPTarr = new ArrayList<Integer>();
+            ArrayList<Integer> ESCarr = new ArrayList<Integer>();
+            ArrayList<Integer> CRSCarr = new ArrayList<Integer>();
+            for (int pageTableSize = 10; pageTableSize <= 100; pageTableSize+=10){
+                System.out.println("pageTableSize: "+ pageTableSize);
+                System.out.print("  FIFO :  ");
+                FIFOAlgo(pageTableSize,testcase,FIFOarr);
+                System.out.print("  OPT :   ");
+                OptimalAlgo(pageTableSize,testcase,OPTarr);
+                System.out.print("  ESC :   ");
+                ESCAlgo(pageTableSize,testcase,ESCarr);
+                System.out.print(" CRSC :   ");
+                CRSCAlgo(pageTableSize,testcase,CRSCarr);
+            }
+            try (PrintWriter writer = new PrintWriter(new File(choice))) {
+
+                StringBuilder sb = new StringBuilder();
+                sb.append("pageTableSize");
+                sb.append(',');
+                sb.append("FIFO");
+                sb.append(',');
+                sb.append("OPT");
+                sb.append(',');
+                sb.append("ESC");
+                sb.append(',');
+                sb.append("CRSC");
+                sb.append('\n');
+                for(int i = 0,pageTableSize = 10; i < FIFOarr.size(); i++,pageTableSize+=10){
+                    sb.append(pageTableSize);
+                    sb.append(',');
+                    sb.append(FIFOarr.get(i));
+                    sb.append(',');
+                    sb.append(OPTarr.get(i));
+                    sb.append(',');
+                    sb.append(ESCarr.get(i));
+                    sb.append(',');
+                    sb.append(CRSCarr.get(i));
+                    sb.append('\n');
+                }
+
+                writer.write(sb.toString());
+
+                System.out.println("done!");
+
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
         }
-        for (int pageTableSize = 10; pageTableSize <= 100; pageTableSize+=10){
-            System.out.println("pageTableSize: "+ pageTableSize);
-            System.out.print("  FIFO :  ");
-            FIFOAlgo(pageTableSize,testcase);
-            System.out.print("  OPT :   ");
-            OptimalAlgo(pageTableSize,testcase);
-            System.out.print("  ESC :   ");
-            ESCAlgo(pageTableSize,testcase);
-            System.out.print(" CRSC :   ");
-            CRSCAlgo(pageTableSize,testcase);
-        }
+
 
 
 
