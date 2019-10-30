@@ -6,7 +6,14 @@ import java.util.Scanner;
 public class Main {
 
     static private void FIFOAlgo(int pageTableSize,int[] testcase){
-
+        /*
+        FIFO 演算法:
+        1. page fault++ 條件: 當table中沒有要求的reference
+        2. diskwrite++ 條件: <=30%
+        3. 當page fault發生的時候：先進先出
+        4. interrupt: trap一次，disk寫入一次 = page fault*2
+        5. 如果已經在table內重新植入arraylist<>，當作新的
+         */
         FIFOpage thePage = new FIFOpage();
         HardDrive thereference = new HardDrive();
 
@@ -53,6 +60,14 @@ public class Main {
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
     }
     static private void OptimalAlgo(int pageTableSize,int[] testcase){
+        /*
+        Optimal 演算法:
+        1. page fault++ 條件: 當table中沒有要求的reference
+        2. diskwrite++ 條件: <=30%
+        3. 當page fault發生的時候：進入predict() 得到應該替換的table index
+        4. predict() 找下次出現時的位置，最遠的即是替換目標
+        5. interrupt: trap一次，disk寫入phyical memory一次 = page fault*2
+         */
         Optimalpage thePage = new Optimalpage();
         HardDrive thereference = new HardDrive();
         int pagefault = 0;
@@ -98,6 +113,14 @@ public class Main {
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
     }
     static private void ESCAlgo(int pageTableSize,int[]testcase){
+        /*
+        ESC 演算法:
+        1. page fault++ 條件: 當table中沒有要求的reference
+        2. diskwrite++ 條件: modifybit = 0(30%)
+        3. 當page fault發生的時候：進入pick() 得到應該替換的table index
+        4. pick() 預設reference bit = 1 首先先調查是否有(0,0) 再來調查(0,0)(0,1)如果都不是 referencebit = 0
+        5. interrupt: trap一次，disk寫入phyical memory一次 = page fault*2
+         */
         ESCpage thePage  = new ESCpage();
         HardDrive thereference = new HardDrive();
         int pagefault = 0;
@@ -148,6 +171,15 @@ public class Main {
         System.out.println("pagefault: " + pagefault + ", harddriveW: " + harddriveW);
     }
     static private void CRSCAlgo(int pageTableSize,int[]testcase){
+        /*
+        CRSC 演算法:
+        1. page fault++ 條件: 當table中沒有要求的reference
+        2. diskwrite++ 條件: (30%)
+        3. 當page fault發生的時候：進入CRSCpick() 得到應該替換的table index
+        4. CRSCpick() 預設reference bit = 1 SCBit = 1, 首先先調查是否有(0,0) 再來調查(0,0)(0,1)如果都不是  如果這個table index page>28 reference bit == 0(換掉)
+
+        5. interrupt: trap一次，disk寫入phyical memory一次 = page fault*2
+         */
         CRSCpage thePage = new CRSCpage();
         HardDrive thereference = new HardDrive();
         int pagefault = 0;
@@ -220,6 +252,7 @@ public class Main {
     static private int pick(int pagetablesize, ESCpage thePage,int startPoint){
         int j = startPoint;
         int count = 0;
+        /*(0,0)*/
         for (int i = 0; i < pagetablesize; i++){
             boolean tmp1 = (thePage.index.get(j).referenceBit == 0)&&(thePage.index.get(j).modifyBit == 0);
             if(tmp1){
@@ -228,6 +261,7 @@ public class Main {
             j = (++j)%pagetablesize;
         }
         j = startPoint;
+        /*(0,0)(0,1)*/
         while (count<(pagetablesize*4)){
             boolean tmp1 = (thePage.index.get(j).referenceBit == 0)&&(thePage.index.get(j).modifyBit == 0);//1 0比1 1先被挑中
             boolean tmp2 = (thePage.index.get(j).referenceBit == 0)&&(thePage.index.get(j).modifyBit == 1);//0 1比另外兩情況先被挑中
